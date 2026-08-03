@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>La Promesa · Thiago · 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#060402;--surface:#0B0703;--panel:#090501;
+      --orange:#FF8C00;--amber:#FFB830;--red-o:#FF4500;
+      --cream:#F0DCA0;--muted:#7A6040;
+      --glow:0 0 10px rgba(255,140,0,.95),0 0 25px rgba(255,100,0,.65),0 0 55px rgba(255,60,0,.30);
+    }
+    html,body{min-height:100%;background:var(--bg);color:var(--cream);overflow-x:hidden}
+    #bg-canvas{position:fixed;inset:0;pointer-events:none;z-index:0}
+
+    header{
+      position:fixed;top:0;left:0;right:0;z-index:200;
+      display:flex;align-items:center;justify-content:center;
+      padding:.9rem 2rem;
+      background:linear-gradient(to bottom,rgba(6,4,2,.97) 60%,transparent);
+    }
+    .brand{
+      font-family:'Cinzel',serif;font-size:.65rem;font-weight:400;
+      letter-spacing:.55em;color:var(--orange);opacity:.85;
+    }
+
+    main{
+      position:relative;z-index:1;min-height:100vh;
+      max-width:1100px;margin:0 auto;
+      padding:5.5rem 2rem 4rem;
+      display:flex;flex-direction:column;align-items:center;gap:3rem;
+    }
+
+    .live{
+      display:flex;align-items:center;gap:.55rem;
+      font-family:'Montserrat',sans-serif;font-size:.55rem;
+      font-weight:500;letter-spacing:.35em;color:var(--muted);text-transform:uppercase;
+    }
+    .live-dot{
+      width:7px;height:7px;border-radius:50%;
+      background:var(--orange);box-shadow:0 0 8px var(--orange);
+      animation:livepulse 1.4s ease-in-out infinite;
+    }
+    @keyframes livepulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--orange)}50%{opacity:.3;box-shadow:none}}
+
+    .hero{text-align:center;width:100%}
+    h1{
+      font-family:'Cinzel',serif;font-weight:700;
+      font-size:min(20vw,9.5rem);line-height:.88;
+      letter-spacing:.18em;color:var(--cream);
+      text-shadow:0 0 80px rgba(255,140,0,.12);margin-bottom:1rem;
+    }
+    .tagline{
+      font-family:'Montserrat',sans-serif;font-weight:300;
+      font-size:clamp(.8rem,2.2vw,1rem);letter-spacing:.22em;
+      color:var(--muted);text-transform:uppercase;
+    }
+
+    .section-rule{width:100%;height:1px;background:linear-gradient(to right,transparent,rgba(255,140,0,.2),transparent)}
+
+    .clock-section{width:100%}
+    .clock-header{
+      font-family:'Montserrat',sans-serif;font-size:.55rem;font-weight:500;
+      letter-spacing:.4em;color:var(--muted);text-transform:uppercase;
+      text-align:center;margin-bottom:1.8rem;
+    }
+    .clock{display:flex;align-items:flex-start;justify-content:center;flex-wrap:nowrap}
+    .clock-unit{display:flex;flex-direction:column;align-items:center;gap:.75rem;flex:1;max-width:180px;min-width:0}
+
+    .panel{
+      width:100%;background:var(--panel);
+      border:1px solid rgba(255,140,0,.2);border-radius:5px;
+      padding:clamp(.5rem,.8vw+.3rem,1rem) clamp(.3rem,.4vw+.2rem,.6rem);
+      display:flex;justify-content:center;position:relative;overflow:hidden;
+      box-shadow:inset 0 2px 4px rgba(0,0,0,.6),inset 0 0 30px rgba(0,0,0,.4),0 0 18px rgba(255,80,0,.07);
+      transition:box-shadow .3s;
+    }
+    .panel::before{
+      content:'';position:absolute;inset:0;
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.07) 3px,rgba(0,0,0,.07) 6px);
+      pointer-events:none;z-index:1;
+    }
+    .panel::after{
+      content:'';position:absolute;top:0;left:0;right:0;height:40%;
+      background:linear-gradient(to bottom,rgba(255,255,255,.025),transparent);
+      pointer-events:none;z-index:1;
+    }
+
+    .digit{
+      font-family:'Orbitron',sans-serif;font-weight:700;
+      font-size:clamp(1.8rem,6.5vw,4.8rem);line-height:1;
+      color:var(--orange);text-shadow:var(--glow);
+      letter-spacing:.04em;min-width:2ch;text-align:center;position:relative;z-index:2;
+    }
+    @keyframes digitFlash{0%{color:#FFF;text-shadow:0 0 20px #FFF,0 0 50px var(--orange)}100%{color:var(--orange);text-shadow:var(--glow)}}
+    .digit.flash{animation:digitFlash .25s ease-out}
+
+    .clock-lbl{font-family:'Montserrat',sans-serif;font-size:.5rem;font-weight:500;letter-spacing:.35em;color:var(--muted);text-transform:uppercase}
+
+    .colon{
+      font-family:'Orbitron',sans-serif;font-weight:700;
+      font-size:clamp(1.4rem,4.5vw,3.2rem);color:var(--orange);text-shadow:var(--glow);
+      padding:0 clamp(.1rem,.35vw,.45rem);margin-top:clamp(.35rem,.7vw,.8rem);
+      flex-shrink:0;animation:colonblink 1s step-start infinite;
+    }
+    @keyframes colonblink{0%,49%{opacity:1}50%,100%{opacity:.1}}
+
+    #u-secs.tick .panel{box-shadow:inset 0 2px 4px rgba(0,0,0,.6),inset 0 0 30px rgba(0,0,0,.4),0 0 35px rgba(255,100,0,.25)}
+
+    .progress-section{width:100%;display:flex;flex-direction:column;gap:.75rem}
+    .prog-header{display:flex;justify-content:space-between;align-items:baseline}
+    .prog-title{font-family:'Montserrat',sans-serif;font-size:.55rem;font-weight:500;letter-spacing:.38em;color:var(--muted);text-transform:uppercase}
+    .prog-pct{font-family:'Orbitron',sans-serif;font-size:.9rem;font-weight:700;color:var(--orange);text-shadow:0 0 12px rgba(255,140,0,.6)}
+    .prog-track{width:100%;height:4px;background:rgba(255,140,0,.07);border:1px solid rgba(255,140,0,.1);border-radius:2px;overflow:hidden}
+    .prog-fill{height:100%;width:0;border-radius:2px;background:linear-gradient(to right,var(--red-o),var(--orange),var(--amber));box-shadow:0 0 10px rgba(255,140,0,.7);transition:width .8s ease;position:relative}
+    .prog-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35) 50%,transparent);animation:shimmer 2.2s ease-in-out infinite}
+    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+    .prog-dates{display:flex;justify-content:space-between;font-family:'Montserrat',sans-serif;font-size:.48rem;letter-spacing:.2em;color:rgba(122,96,64,.6);text-transform:uppercase}
+
+    .cards-grid{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+    .card{background:var(--surface);border:1px solid rgba(255,140,0,.1);border-top:2px solid rgba(255,140,0,.35);padding:1.3rem 1.2rem;display:flex;flex-direction:column;gap:.6rem}
+    .card-warn{border-top-color:rgba(255,70,0,.5);background:#0B0400}
+    .card-lbl{font-family:'Montserrat',sans-serif;font-size:.49rem;font-weight:500;letter-spacing:.38em;color:var(--muted);text-transform:uppercase}
+    .card-val{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.2vw,1.1rem);font-weight:400;color:var(--cream);letter-spacing:.06em}
+    .card-warn .card-val{color:#FF6030;text-shadow:0 0 14px rgba(255,80,0,.4)}
+    .card-sub{font-family:'Montserrat',sans-serif;font-size:.47rem;letter-spacing:.15em;color:rgba(122,96,64,.6);text-transform:uppercase;margin-top:.1rem}
+
+    .quote-section{width:100%;text-align:center;padding-top:2rem;border-top:1px solid rgba(255,140,0,.08)}
+    .quote{font-family:'Cinzel',serif;font-size:clamp(1rem,2.5vw,1.25rem);font-weight:400;color:rgba(122,96,64,.7);letter-spacing:.1em;line-height:1.6}
+    .quote em{color:rgba(240,220,160,.35);font-style:normal}
+
+    .foot{font-family:'Montserrat',sans-serif;font-size:.46rem;letter-spacing:.25em;color:rgba(122,96,64,.3);text-transform:uppercase;text-align:center;padding-bottom:1rem}
+
+    @media(max-width:700px){main{padding:5rem 1rem 3rem;gap:2.2rem}.cards-grid{grid-template-columns:1fr}h1{letter-spacing:.1em}}
+    @media(max-width:480px){.panel{padding:.45rem .2rem}.digit{font-size:clamp(1.5rem,9vw,2.8rem)}.colon{font-size:clamp(1.2rem,7vw,2rem);margin-top:.25rem}}
+    @media(prefers-reduced-motion:reduce){.live-dot,.prog-fill::after{animation:none}.digit.flash{animation:none}.colon{animation:none;opacity:1}}
+
+    /* ── OVERLAY DE INICIO ── */
+    #start-overlay{
+      position:fixed;inset:0;z-index:9999;
+      background:rgba(6,4,2,.96);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:1.8rem;cursor:pointer;
+      transition:opacity .6s ease;
+    }
+    #start-overlay.hidden{opacity:0;pointer-events:none}
+    .start-pulse{
+      width:90px;height:90px;border-radius:50%;
+      background:rgba(255,140,0,.08);
+      border:2px solid rgba(255,140,0,.4);
+      display:flex;align-items:center;justify-content:center;
+      font-size:2.6rem;
+      animation:heartpulse 1.1s ease-in-out infinite;
+    }
+    @keyframes heartpulse{
+      0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,140,0,.4)}
+      50%{transform:scale(1.08);box-shadow:0 0 0 18px rgba(255,140,0,0)}
+    }
+    .start-title{
+      font-family:'Cinzel',serif;font-size:clamp(1rem,3vw,1.4rem);
+      letter-spacing:.25em;color:var(--cream);text-align:center;
+    }
+    .start-sub{
+      font-family:'Montserrat',sans-serif;font-size:.6rem;
+      letter-spacing:.3em;color:var(--muted);text-transform:uppercase;text-align:center;
+    }
+  </style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<!-- OVERLAY: pulsa para iniciar audio -->
+<div id="start-overlay">
+  <div class="start-pulse">❤️</div>
+  <p class="start-title">La Promesa · Thiago</p>
+  <p class="start-sub">Toca para iniciar</p>
+</div>
+
+<header>
+  <span class="brand">La Promesa &nbsp;·&nbsp; 2026</span>
+</header>
+
+<main>
+  <div class="live"><span class="live-dot"></span>Cuenta atrás en curso</div>
+
+  <div class="hero">
+    <h1>THIAGO</h1>
+    <p class="tagline">Lo prometió. Nosotros no olvidamos.</p>
+  </div>
+
+  <div class="section-rule"></div>
+
+  <div class="clock-section">
+    <p class="clock-header">Tiempo restante</p>
+    <div class="clock">
+      <div class="clock-unit">
+        <div class="panel"><span class="digit" id="n-months">-</span></div>
+        <span class="clock-lbl">Meses</span>
+      </div>
+      <span class="colon">:</span>
+      <div class="clock-unit">
+        <div class="panel"><span class="digit" id="n-days">--</span></div>
+        <span class="clock-lbl">Días</span>
+      </div>
+      <span class="colon">:</span>
+      <div class="clock-unit">
+        <div class="panel"><span class="digit" id="n-hours">--</span></div>
+        <span class="clock-lbl">Horas</span>
+      </div>
+      <span class="colon">:</span>
+      <div class="clock-unit">
+        <div class="panel"><span class="digit" id="n-mins">--</span></div>
+        <span class="clock-lbl">Min</span>
+      </div>
+      <span class="colon">:</span>
+      <div class="clock-unit" id="u-secs">
+        <div class="panel"><span class="digit" id="n-secs">--</span></div>
+        <span class="clock-lbl">Seg</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-rule"></div>
+
+  <div class="progress-section">
+    <div class="prog-header">
+      <span class="prog-title">Proceso en curso · 2026</span>
+      <span class="prog-pct" id="prog-pct">0.0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+    <div class="prog-dates"><span>1 Ene 2026</span><span>31 Dic 2026</span></div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card">
+      <span class="card-lbl">Origen</span>
+      <span class="card-val">Sus propias palabras</span>
+      <span class="card-sub">Promesa voluntaria</span>
+    </div>
+    <div class="card card-warn">
+      <span class="card-lbl">Estado</span>
+      <span class="card-val">Pendiente</span>
+      <span class="card-sub">Sin cumplir</span>
+    </div>
+    <div class="card">
+      <span class="card-lbl">Ambiente</span>
+      <span class="card-val">Cálido</span>
+      <span class="card-sub">Muy cálido</span>
+    </div>
+  </div>
+
+  <div class="section-rule"></div>
+
+  <div class="quote-section">
+    <p class="quote">«Lo que se cuece, se cumple.»<br><em>— La Promesa, 2026</em></p>
+  </div>
+
+  <p class="foot">31 · diciembre · 2026 &nbsp;—&nbsp; berlyChess</p>
+</main>
+
+<script>
+/* ══════════════════════════════════════════════
+   CANVAS — LLAMAS EN BASE + CENIZAS/BRASAS
+══════════════════════════════════════════════ */
+const cv = document.getElementById('bg-canvas');
+const cx = cv.getContext('2d');
+function resizeCv(){cv.width=innerWidth;cv.height=innerHeight}
+resizeCv();
+window.addEventListener('resize',resizeCv);
+
+/* — Partícula de polvo/ceniza (flota por TODA la pantalla como polvo en el aire) — */
+class Ash {
+  constructor(init){
+    this.init = init;
+    this.reset();
+    // Si es inicial, distribuir por toda la pantalla (no solo abajo)
+    if(init){
+      this.y = Math.random()*cv.height;
+      this.life = Math.random()*this.maxL; // ciclo de vida aleatorio para variedad
+    }
+  }
+  reset(){
+    // Nacer desde cualquier punto de la mitad inferior o los bordes laterales
+    const spawnZone = Math.random();
+    if(spawnZone < 0.6){
+      // Mayoría sube desde la parte baja (fuego)
+      this.x = Math.random()*cv.width;
+      this.y = cv.height + 4;
+    } else if(spawnZone < 0.8){
+      // Algunos entran por el lado izquierdo a diferentes alturas
+      this.x = -4;
+      this.y = cv.height*0.2 + Math.random()*cv.height*0.8;
+    } else {
+      // Algunos entran por el lado derecho
+      this.x = cv.width + 4;
+      this.y = cv.height*0.2 + Math.random()*cv.height*0.8;
+    }
+    this.r    = Math.random()*1.6 + 0.2;
+    this.vy   = Math.random()*0.45 + 0.08; // muy lento para que flote
+    this.vx   = (Math.random()-0.5)*0.55;
+    this.wobble = Math.random()*Math.PI*2;
+    this.wobbleSpeed = 0.015 + Math.random()*0.025;
+    this.drift = (Math.random()-0.5)*0.3; // deriva horizontal lenta
+    this.life = 0;
+    // Vida larga para que lleguen bien alto (atraviesen toda la pantalla)
+    this.maxL = Math.random()*380 + 200;
+    // mezcla: ceniza dorada, brasa naranja, polvo gris cálido, humo rojizo
+    const r = Math.random();
+    if(r > 0.7)      this.col = '#C8A060'; // ceniza dorada
+    else if(r > 0.45) this.col = '#FF7020'; // brasa naranja
+    else if(r > 0.25) this.col = '#D4906A'; // polvo rojizo
+    else              this.col = '#9A8878'; // humo grisáceo cálido
+  }
+  update(){
+    this.wobble += this.wobbleSpeed;
+    this.x += this.vx + Math.sin(this.wobble)*0.5 + this.drift;
+    this.y -= this.vy;
+    // Pequeño vaivén vertical suave (flota de verdad)
+    this.y += Math.sin(this.wobble*0.7)*0.15;
+    this.life++;
+    if(this.life > this.maxL || this.y < -15 || this.x < -15 || this.x > cv.width+15) this.reset();
+  }
+  draw(){
+    const progress = this.life/this.maxL;
+    // Opacidad en arco: aparece suave, flota, desaparece — más visible que antes
+    const a = Math.sin(Math.PI*progress)*0.38;
+    cx.save();
+    cx.globalAlpha = a;
+    cx.fillStyle = this.col;
+    cx.beginPath();
+    cx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+    cx.fill();
+    cx.restore();
+  }
+}
+
+/* — Mota de polvo extra: muy pequeña, casi invisible, densa arriba — */
+class Dust {
+  constructor(){
+    this.reset();
+    this.y = Math.random()*cv.height; // distribuidas por toda la pantalla al inicio
+    this.life = Math.random()*180;
+  }
+  reset(){
+    this.x  = Math.random()*cv.width;
+    this.y  = cv.height*0.3 + Math.random()*cv.height*0.7; // de la mitad hacia abajo
+    this.r  = Math.random()*0.9 + 0.1;
+    this.vy = Math.random()*0.22 + 0.04;
+    this.vx = (Math.random()-0.5)*0.25;
+    this.wobble = Math.random()*Math.PI*2;
+    this.wobbleSpeed = 0.01 + Math.random()*0.015;
+    this.life = 0;
+    this.maxL = Math.random()*300 + 160;
+    // Solo tonos cálidos muy apagados
+    const r = Math.random();
+    this.col = r > 0.5 ? '#A07840' : '#804030';
+  }
+  update(){
+    this.wobble += this.wobbleSpeed;
+    this.x += this.vx + Math.sin(this.wobble)*0.3;
+    this.y -= this.vy;
+    this.life++;
+    if(this.life > this.maxL || this.y < -10) this.reset();
+  }
+  draw(){
+    const progress = this.life/this.maxL;
+    const a = Math.sin(Math.PI*progress)*0.18; // muy tenue
+    cx.save();
+    cx.globalAlpha = a;
+    cx.fillStyle = this.col;
+    cx.beginPath();
+    cx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+    cx.fill();
+    cx.restore();
+  }
+}
+
+/* — Partícula de llama (base de pantalla, corta, cálida) — */
+class Flame {
+  constructor(){this.reset()}
+  reset(){
+    this.x    = Math.random()*cv.width;
+    this.y    = cv.height;
+    this.vy   = Math.random()*2.2 + 1.0;
+    this.vx   = (Math.random()-0.5)*0.8;
+    this.life = 0;
+    this.maxL = Math.random()*40 + 20;
+    this.r    = Math.random()*3.5 + 1.5;
+    const t = Math.random();
+    this.r1 = 255;
+    this.g1 = Math.round(t > 0.5 ? 180 : t > 0.25 ? 80 : 30);
+    this.b1 = 0;
+  }
+  update(){
+    this.x += this.vx;
+    this.y -= this.vy;
+    this.vy *= 0.97;
+    this.r  *= 0.97;
+    this.life++;
+    if(this.life > this.maxL || this.r < 0.3) this.reset();
+  }
+  draw(){
+    const progress = this.life/this.maxL;
+    const a = (1 - progress)*0.55;
+    const grad = cx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*2);
+    grad.addColorStop(0, `rgba(${this.r1},${this.g1},${this.b1},${a})`);
+    grad.addColorStop(1, `rgba(${this.r1},0,0,0)`);
+    cx.save();
+    cx.globalCompositeOperation = 'lighter';
+    cx.fillStyle = grad;
+    cx.beginPath();
+    cx.arc(this.x, this.y, this.r*2, 0, Math.PI*2);
+    cx.fill();
+    cx.restore();
+  }
+}
+
+/* — Chispa viva (pequeña, rápida, muy brillante) — */
+class Spark {
+  constructor(){this.reset()}
+  reset(){
+    this.x  = Math.random()*cv.width;
+    this.y  = cv.height - Math.random()*80;
+    this.vx = (Math.random()-0.5)*3;
+    this.vy = Math.random()*4 + 2;
+    this.life = 0;
+    this.maxL = Math.random()*35 + 20;
+    this.col  = Math.random()>0.5 ? '#FFCC44' : '#FF8800';
+  }
+  update(){
+    this.x += this.vx;
+    this.y -= this.vy;
+    this.vy *= 0.94;
+    this.vx *= 0.98;
+    this.life++;
+    if(this.life > this.maxL) this.reset();
+  }
+  draw(){
+    const a = (1 - this.life/this.maxL)*0.9;
+    cx.save();
+    cx.globalAlpha = a;
+    cx.globalCompositeOperation = 'lighter';
+    cx.fillStyle = this.col;
+    cx.beginPath();
+    cx.arc(this.x, this.y, 1.2, 0, Math.PI*2);
+    cx.fill();
+    cx.restore();
+  }
+}
+
+// Más cenizas para que haya polvo visible por toda la pantalla
+const ashes  = Array.from({length:180}, (_,i)=>new Ash(i<100));
+const dusts  = Array.from({length:120}, ()=>new Dust());
+const flames = Array.from({length:80},  ()=>new Flame());
+const sparks = Array.from({length:40},  ()=>new Spark());
+
+(function loop(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  flames.forEach(p=>{p.update();p.draw()});
+  sparks.forEach(p=>{p.update();p.draw()});
+  dusts.forEach(p=>{p.update();p.draw()});
+  ashes.forEach(p=>{p.update();p.draw()});
+  requestAnimationFrame(loop);
+})();
+
+/* ── COUNTDOWN ── */
+// Deadline fija: 31 dic 2026 23:59:59
+const DEADLINE   = new Date('2026-12-31T23:59:59').getTime();
+const YEAR_START = new Date('2026-01-01T00:00:00').getTime();
+const YEAR_TOTAL = DEADLINE - YEAR_START;
+
+const elMo  = document.getElementById('n-months');
+const elD   = document.getElementById('n-days');
+const elH   = document.getElementById('n-hours');
+const elMi  = document.getElementById('n-mins');
+const elS   = document.getElementById('n-secs');
+const uSec  = document.getElementById('u-secs');
+const pFil  = document.getElementById('prog-fill');
+const pPct  = document.getElementById('prog-pct');
+
+const pad = n => String(n).padStart(2,'0');
+let prev = {mo:'',d:'',h:'',m:'',s:''};
+
+function flash(el,val,old){
+  el.textContent = val;
+  if(val !== old){
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+  }
+}
+
+// Calcula meses restantes por diferencia de calendario real
+function calendarDiff(nowMs, deadlineMs){
+  const now = new Date(nowMs);
+  const dl  = new Date(deadlineMs);
+
+  let months = (dl.getFullYear()-now.getFullYear())*12 + (dl.getMonth()-now.getMonth());
+  // Ajustar si el día del deadline es anterior al día actual dentro del mes
+  const check = new Date(now.getFullYear(), now.getMonth()+months, now.getDate(),
+                         now.getHours(), now.getMinutes(), now.getSeconds());
+  if(check > dl) months--;
+
+  const afterMonths = new Date(now.getFullYear(), now.getMonth()+months, now.getDate(),
+                                now.getHours(), now.getMinutes(), now.getSeconds());
+  const remMs  = deadlineMs - afterMonths.getTime();
+  const remSec = Math.floor(remMs / 1000);
+  return {
+    months,
+    days:  Math.floor(remSec / 86400),
+    hours: Math.floor((remSec % 86400) / 3600),
+    mins:  Math.floor((remSec % 3600) / 60),
+    secs:  remSec % 60
+  };
+}
+
+let lastDisplayedSec = -1;
+
+/* ── AUDIO — variables declaradas ANTES de tick() ── */
+let audioCtx   = null;
+let audioReady = false;
+let lastBeat   = 0;
+let ambNodes   = null;
+
+function tick(){
+  const nowMs = Date.now();
+  const diff  = DEADLINE - nowMs;
+
+  if(diff <= 0){
+    [elMo,elD,elH,elMi,elS].forEach(el=>el.textContent='00');
+    pFil.style.width='100%';
+    pPct.textContent='100.0%';
+    return;
+  }
+
+  const curSec = Math.floor(diff / 1000);
+
+  // Actualizar dígitos solo cuando cambia el segundo
+  if(curSec !== lastDisplayedSec){
+    lastDisplayedSec = curSec;
+
+    const {months,days,hours,mins,secs} = calendarDiff(nowMs, DEADLINE);
+
+    const vMo = String(months);
+    const vD  = pad(days);
+    const vH  = pad(hours);
+    const vMi = pad(mins);
+    const vS  = pad(secs);
+
+    flash(elMo, vMo, prev.mo); prev.mo = vMo;
+    flash(elD,  vD,  prev.d);  prev.d  = vD;
+    flash(elH,  vH,  prev.h);  prev.h  = vH;
+    flash(elMi, vMi, prev.m);  prev.m  = vMi;
+    flash(elS,  vS,  prev.s);  prev.s  = vS;
+
+    // Glow en segundos
+    uSec.classList.add('tick');
+    setTimeout(()=>uSec.classList.remove('tick'), 300);
+
+    // Sonido latido (solo si audio ya iniciado por interacción)
+    if(audioReady) playHeartbeat();
+  }
+
+  // Barra de progreso — se actualiza continuamente (suave)
+  const pct = ((nowMs - YEAR_START) / YEAR_TOTAL) * 100;
+  const pctClamped = Math.min(100, Math.max(0, pct));
+  pFil.style.width = pctClamped.toFixed(3) + '%';
+  pPct.textContent = pctClamped.toFixed(1) + '%';
+}
+
+// Correr tick cada ~100ms para no perdernos el cambio de segundo
+// setInterval es más fiable en segundo plano que rAF
+const tickInterval = setInterval(tick, 100);
+tick(); // primer render instantáneo al cargar
+
+/* ══════════════════════════════════════════════
+   AUDIO
+══════════════════════════════════════════════ */
+const overlay = document.getElementById('start-overlay');
+
+function initAudio(){
+  if(audioReady) return;
+  try{
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtx.resume().then(()=>{
+      audioReady = true;
+      startFireAmbient();
+    });
+  }catch(e){ console.error('AudioContext error:', e); }
+}
+
+overlay.addEventListener('click', ()=>{
+  initAudio();
+  overlay.classList.add('hidden');
+  setTimeout(()=>overlay.remove(), 700);
+});
+overlay.addEventListener('touchend', (e)=>{
+  e.preventDefault();
+  initAudio();
+  overlay.classList.add('hidden');
+  setTimeout(()=>overlay.remove(), 700);
+});
+
+/* ──────────────────────────────────────────
+   SONIDO 1: LATIDO DE CORAZÓN
+   Lub-dub nítido cada segundo.
+   Dos golpes cortos con mucho cuerpo,
+   claramente audibles sobre el fuego.
+────────────────────────────────────────── */
+function playHeartbeat(){
+  if(!audioCtx || !audioReady) return;
+  const now = audioCtx.currentTime;
+  if(now - lastBeat < 0.82) return;
+  lastBeat = now;
+
+  function thump(startT, freqLow, freqMid, gain, decaySec){
+    const sr  = audioCtx.sampleRate;
+    const len = Math.ceil(sr * (decaySec + 0.05));
+    const buf = audioCtx.createBuffer(1, len, sr);
+    const d   = buf.getChannelData(0);
+
+    // Capa 1: ruido transitorio con ataque súper rápido (el "golpe" percusivo)
+    for(let i = 0; i < len; i++)
+      d[i] = (Math.random()*2 - 1) * Math.exp(-i / (sr * decaySec * 0.28));
+
+    // Capa 2: tono sinusoidal que decae (da cuerpo tonal al golpe)
+    for(let i = 0; i < len; i++){
+      const env = Math.exp(-i / (sr * decaySec * 0.5));
+      d[i] += Math.sin(2*Math.PI*freqLow*i/sr) * env * 0.7;
+    }
+
+    const src = audioCtx.createBufferSource(); src.buffer = buf;
+
+    // Paso-bajo: elimina frecuencias artificiales altas
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = freqMid; lp.Q.value = 0.9;
+
+    // Pico resonante en graves — el "thump" carnoso
+    const pk = audioCtx.createBiquadFilter();
+    pk.type = 'peaking'; pk.frequency.value = freqLow; pk.gain.value = 18; pk.Q.value = 2.5;
+
+    // Compresor para que no clipee aunque subamos el gain
+    const comp = audioCtx.createDynamicsCompressor();
+    comp.threshold.value = -12;
+    comp.knee.value = 6;
+    comp.ratio.value = 4;
+    comp.attack.value = 0.001;
+    comp.release.value = 0.12;
+
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(gain, startT);
+    g.gain.exponentialRampToValueAtTime(0.001, startT + decaySec + 0.05);
+
+    src.connect(lp); lp.connect(pk); pk.connect(comp); comp.connect(g); g.connect(audioCtx.destination);
+    src.start(startT); src.stop(startT + decaySec + 0.08);
+  }
+
+  // LUB — 55 Hz pico, fuerte y claro
+  thump(now,        55, 240, 2.8, 0.26);
+  // DUB — 75 Hz pico, 240ms después, algo más corto
+  thump(now + 0.24, 75, 300, 1.8, 0.18);
+}
+
+/* ──────────────────────────────────────────
+   SONIDO 2: CHIMENEA SUAVE (ambiente)
+   Ruido marrón muy filtrado, volumen bajo.
+   Sin LFO de ola — solo crepitar sutil
+   y calor de fondo casi imperceptible.
+────────────────────────────────────────── */
+function startFireAmbient(){
+  if(!audioCtx) return;
+
+  const sr     = audioCtx.sampleRate;
+
+  // — Capa 1: rumor muy grave de chimenea — (el "calor" de fondo, apenas perceptible)
+  const bufLen1 = sr * 6;
+  const fireBuf1 = audioCtx.createBuffer(1, bufLen1, sr);
+  const fd1 = fireBuf1.getChannelData(0);
+  let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for(let i=0;i<bufLen1;i++){
+    const w = Math.random()*2-1;
+    b0=0.99886*b0+w*0.0555179; b1=0.99332*b1+w*0.0750759;
+    b2=0.96900*b2+w*0.1538520; b3=0.86650*b3+w*0.3104856;
+    b4=0.55000*b4+w*0.5329522; b5=-0.7616*b5-w*0.0168980;
+    fd1[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;
+    b6=w*0.115926;
+  }
+  const fireSrc1 = audioCtx.createBufferSource();
+  fireSrc1.buffer = fireBuf1; fireSrc1.loop = true;
+
+  // Paso-bajo muy agresivo: solo sub-bajos cálidos (< 300 Hz)
+  // Da la sensación de calor sin ser intrusivo
+  const lp1 = audioCtx.createBiquadFilter();
+  lp1.type='lowpass'; lp1.frequency.value=300; lp1.Q.value=0.4;
+
+  const lp2 = audioCtx.createBiquadFilter(); // segundo paso-bajo para suavizar más
+  lp2.type='lowpass'; lp2.frequency.value=500; lp2.Q.value=0.3;
+
+  // Volumen muy discreto — se nota pero no protagoniza
+  const fireGain1 = audioCtx.createGain();
+  fireGain1.gain.setValueAtTime(0, audioCtx.currentTime);
+  fireGain1.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 4);
+
+  fireSrc1.connect(lp1); lp1.connect(lp2); lp2.connect(fireGain1); fireGain1.connect(audioCtx.destination);
+  fireSrc1.start();
+
+  // — Capa 2: textura de brasa media (complementa sin destacar) —
+  const bufLen2 = sr * 3;
+  const fireBuf2 = audioCtx.createBuffer(1, bufLen2, sr);
+  const fd2 = fireBuf2.getChannelData(0);
+  let c0=0,c1=0,c2=0,c3=0,c4=0,c5=0,c6=0;
+  for(let i=0;i<bufLen2;i++){
+    const w = Math.random()*2-1;
+    c0=0.99886*c0+w*0.0555179; c1=0.99332*c1+w*0.0750759;
+    c2=0.96900*c2+w*0.1538520; c3=0.86650*c3+w*0.3104856;
+    c4=0.55000*c4+w*0.5329522; c5=-0.7616*c5-w*0.0168980;
+    fd2[i]=(c0+c1+c2+c3+c4+c5+c6+w*0.5362)*0.11;
+    c6=w*0.115926;
+  }
+  const fireSrc2 = audioCtx.createBufferSource();
+  fireSrc2.buffer = fireBuf2; fireSrc2.loop = true;
+  fireSrc2.playbackRate.value = 0.7; // más lento = más grave y calmado
+
+  const bp = audioCtx.createBiquadFilter();
+  bp.type='bandpass'; bp.frequency.value=380; bp.Q.value=0.6;
+
+  const fireGain2 = audioCtx.createGain();
+  fireGain2.gain.setValueAtTime(0, audioCtx.currentTime);
+  fireGain2.gain.linearRampToValueAtTime(0.022, audioCtx.currentTime + 5);
+
+  fireSrc2.connect(bp); bp.connect(fireGain2); fireGain2.connect(audioCtx.destination);
+  fireSrc2.start();
+
+  // — Crepitar muy ocasional: como brasas asentándose —
+  function crackle(){
+    if(!audioReady) return;
+    const t   = audioCtx.currentTime;
+    // Chasquido muy corto y suave
+    const len = Math.ceil(sr * 0.012);
+    const buf = audioCtx.createBuffer(1, len, sr);
+    const d   = buf.getChannelData(0);
+    for(let i=0;i<len;i++)
+      d[i] = (Math.random()*2-1) * Math.exp(-i/(len*0.15));
+
+    const src = audioCtx.createBufferSource(); src.buffer = buf;
+
+    // Filtro medio-alto: el chasquido de brasa (no tan agudo como chispa)
+    const hp = audioCtx.createBiquadFilter();
+    hp.type='bandpass'; hp.frequency.value = 800+Math.random()*1200; hp.Q.value=1.2;
+
+    const g = audioCtx.createGain();
+    // Muy suave — solo se insinúa
+    g.gain.value = 0.015 + Math.random()*0.025;
+
+    src.connect(hp); hp.connect(g); g.connect(audioCtx.destination);
+    src.start(t); src.stop(t+0.025);
+
+    // Intervalo largo: chimenea muy calmada, no llama viva
+    setTimeout(crackle, 800 + Math.random()*2200);
+  }
+  setTimeout(crackle, 2000);
+
+  ambNodes = {fireSrc1, fireSrc2};
+}
+</script>
+</body>
+</html>
